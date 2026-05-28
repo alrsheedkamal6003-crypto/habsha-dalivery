@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هبشة | إضافة طلب جديد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #f5b921;
+            --secondary: #00c6ff;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+            --success: #00b894;
+            --danger: #d63031;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f0f2f5; color: var(--dark); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        .bg-shape { position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; animation: float 10s infinite ease-in-out alternate; }
+        .shape1 { width: 300px; height: 300px; background: rgba(245, 185, 33, 0.3); top: -50px; right: -50px; }
+        .shape2 { width: 250px; height: 250px; background: rgba(0, 198, 255, 0.2); bottom: 10%; left: -50px; animation-delay: -5s; }
+
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(30px) scale(1.1); } }
+
+        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--glass-bg); backdrop-filter: blur(10px); box-shadow: var(--glass-shadow); display: flex; flex-direction: column; }
+        header { background: #fff; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; align-items: center; justify-content: space-between; }
+        
+        .header-title { font-size: 20px; font-weight: 800; color: var(--dark); flex: 1; }
+        .back-btn { background: #f1f2f6; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; color: var(--dark); cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; }
+        .back-btn:hover { background: var(--primary); color: white; }
+
+        .form-section { padding: 25px 20px; flex: 1; overflow-y: auto; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #636e72; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; right: 15px; color: #b2bec3; font-size: 18px; transition: color 0.3s; }
+
+        .form-control { width: 100%; padding: 12px 45px 12px 15px; border: 2px solid #dfe6e9; border-radius: 15px; font-size: 15px; font-family: 'Cairo', sans-serif; background: #fff; color: var(--dark); transition: all 0.3s; outline: none; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+        select.form-control { cursor: pointer; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23b2bec3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'); background-repeat: no-repeat; background-position: left 15px center; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(245, 185, 33, 0.1); }
+        .form-control:focus + i { color: var(--primary); }
+
+        .section-title { font-size: 16px; font-weight: 800; color: var(--primary); margin: 25px 0 15px; border-bottom: 2px dashed #eee; padding-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        
+        .finance-inputs { background: #fff3cd; padding: 15px; border-radius: 15px; border: 1px solid #ffeeba; margin-top: 10px; }
+        .finance-inputs .form-control { border-color: #ffeaa7; }
+        .finance-inputs .form-control:focus { border-color: #d35400; box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1); }
+        .finance-inputs i { color: #d35400; }
+
+        .btn-submit { background: linear-gradient(135deg, var(--primary) 0%, #e1a00a 100%); color: white; border: none; width: 100%; padding: 15px; border-radius: 25px; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 185, 33, 0.4); transition: all 0.3s ease; margin-top: 20px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-submit:hover, .btn-submit:active { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(245, 185, 33, 0.6); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div class="app-container">
+        <header>
+            <button class="back-btn" onclick="goBack()" type="button">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1 class="header-title">إضافة طلب جديد</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div class="form-section">
+            <form id="addOrderForm">
+                
+                <div class="section-title"><i class="fas fa-motorcycle"></i> تعيين الكابتن</div>
+                
+                <div class="form-group">
+                    <label>اختر الكابتن</label>
+                    <div class="input-wrapper">
+                        <select class="form-control" id="captainName" required>
+                            <option value="" disabled selected>-- جاري جلب أسماء الكباتن --</option>
+                        </select>
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-info-circle"></i> البيانات الأساسية</div>
+                
+                <div class="form-group">
+                    <label>المدينة / المنطقة</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="city" placeholder="مثال: عطبرة" required>
+                        <i class="fas fa-city"></i>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-map-marked-alt"></i> تفاصيل المواقع</div>
+
+                <div class="form-group">
+                    <label>من (مكان الاستلام)</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="fromLocation" placeholder="مثال: السوق الرئيسي - عمارة البركة" required>
+                        <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>إلى (مكان التسليم)</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="toLocation" placeholder="مثال: حي المطار - شارع النيل" required>
+                        <i class="fas fa-map-marker-alt" style="color: var(--success);"></i>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-user-check"></i> بيانات المُسَلِّم</div>
+
+                <div class="form-group">
+                    <label>اسم المُسَلِّم</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="senderName" placeholder="مثال: محمد عادل علي يوسف" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>رقم هاتف المُسَلِّم</label>
+                    <div class="input-wrapper">
+                        <input type="tel" class="form-control" id="senderPhone" placeholder="0912345678" dir="ltr" style="text-align: right;" required>
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-user-tag"></i> بيانات المُسْتَلِم</div>
+
+                <div class="form-group">
+                    <label>اسم المُسْتَلِم</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-control" id="receiverName" placeholder="مثال: أحمد كمال" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>رقم هاتف المُسْتَلِم</label>
+                    <div class="input-wrapper">
+                        <input type="tel" class="form-control" id="receiverPhone" placeholder="0112233445" dir="ltr" style="text-align: right;" required>
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                </div>
+
+                <div class="section-title"><i class="fas fa-wallet"></i> التفاصيل المالية</div>
+                
+                <div class="finance-inputs">
+                    <div class="form-group">
+                        <label>المبالغ المستلمة (بالسالب أو الموجب)</label>
+                        <div class="input-wrapper">
+                            <input type="number" class="form-control" id="receivedAmount" placeholder="مثال: -6000" required>
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>مبلغ التوصيل (الأجرة)</label>
+                        <div class="input-wrapper">
+                            <input type="number" class="form-control" id="deliveryFee" placeholder="مثال: 2000" required>
+                            <i class="fas fa-motorcycle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    إضافة الطلب <i class="fas fa-paper-plane"></i>
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        // حماية الشاشة: توجيه المستخدم لشاشة العرض بالاسم الجديد إذا لم يكن أدمن
+        const userRole = localStorage.getItem('userRole');
+        if (userRole !== 'admin') {
+            alert("عذراً، هذه الشاشة مخصصة للإدارة فقط!");
+            window.location.replace("habsha_display.html"); 
+        }
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNIBx_OuXWhPCcoDakf_6Spf3_bYMaRE0",
+            authDomain: "wasel-2ffdb.firebaseapp.com",
+            databaseURL: "https://wasel-2ffdb-default-rtdb.firebaseio.com",
+            projectId: "wasel-2ffdb",
+            storageBucket: "wasel-2ffdb.firebasestorage.app",
+            messagingSenderId: "1085350406361",
+            appId: "1:1085350406361:web:660ae3010cc9ff430176c8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // --- جلب أسماء الكباتن لتعبئة القائمة المنسدلة تلقائياً ---
+        const captainSelect = document.getElementById('captainName');
+        const captainsList = ["عثمان التجاني", "نسيبة صلاح الدين", "محمد عادل علي يوسف"]; 
+
+        function fillCaptainsList(captainsArray) {
+            captainSelect.innerHTML = '<option value="" disabled selected>-- اختر كابتن التوصيل --</option>';
+            captainsArray.forEach(cap => {
+                captainSelect.innerHTML += `<option value="${cap}">${cap}</option>`;
+            });
+        }
+        fillCaptainsList(captainsList);
+
+        // تم تعديل دالة العودة لترجع الأدمن لشاشة العرض الرئيسية لمتابعة الطلبات
+        window.goBack = function() {
+            window.location.href = "habsha_display.html"; 
+        }
+
+        // حفظ الطلب
+        document.getElementById('addOrderForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            const captainName = document.getElementById('captainName').value;
+            const city = document.getElementById('city').value;
+            const fromLoc = document.getElementById('fromLocation').value;
+            const toLoc = document.getElementById('toLocation').value;
+            const senderName = document.getElementById('senderName').value;
+            const senderPhone = document.getElementById('senderPhone').value;
+            const receiverName = document.getElementById('receiverName').value;
+            const receiverPhone = document.getElementById('receiverPhone').value;
+            const receivedAmount = parseFloat(document.getElementById('receivedAmount').value) || 0;
+            const deliveryFee = parseFloat(document.getElementById('deliveryFee').value) || 0;
+
+            const btn = document.querySelector('.btn-submit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'جاري الإضافة... <i class="fas fa-spinner fa-spin"></i>';
+            btn.style.opacity = "0.8";
+            btn.disabled = true;
+
+            try {
+                const ordersRef = ref(database, 'orders');
+                const newOrderRef = push(ordersRef); 
+                
+                await set(newOrderRef, {
+                    captainName: captainName, 
+                    city: city,
+                    fromLocation: fromLoc,
+                    toLocation: toLoc,
+                    senderName: senderName,
+                    senderPhone: senderPhone,
+                    receiverName: receiverName,
+                    receiverPhone: receiverPhone,
+                    receivedAmount: receivedAmount,
+                    deliveryFee: deliveryFee,
+                    status: "new", 
+                    timestamp: new Date().toISOString()
+                });
+
+                alert("تم إضافة الطلب بنجاح!\nسيظهر الآن في شاشة الكابتن: " + captainName);
+                document.getElementById('addOrderForm').reset();
+
+            } catch (error) {
+                console.error("خطأ: ", error);
+                alert("حدث خطأ أثناء حفظ الطلب.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.style.opacity = "1";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

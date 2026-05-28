@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هبشة | تطبيق التوصيل - شاشة الكابتن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #f5b921;
+            --secondary: #00c6ff;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+            --success: #00b894;
+            --danger: #d63031;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f0f2f5; color: var(--dark); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        .bg-shape { position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; animation: float 10s infinite ease-in-out alternate; }
+        .shape1 { width: 300px; height: 300px; background: rgba(245, 185, 33, 0.3); top: -50px; right: -50px; }
+        .shape2 { width: 250px; height: 250px; background: rgba(0, 198, 255, 0.2); bottom: 10%; left: -50px; animation-delay: -5s; }
+
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(30px) scale(1.1); } }
+
+        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--glass-bg); backdrop-filter: blur(10px); box-shadow: var(--glass-shadow); position: relative; display: flex; flex-direction: column; }
+        header { background: #fff; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; padding: 30px 20px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+        .brand-image { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 15px; transition: transform 0.3s; }
+        .brand-title { font-size: 24px; font-weight: 800; letter-spacing: 1px; margin-bottom: 5px; }
+        .greeting { color: #636e72; font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+
+        /* أزرار الهيدر */
+        .header-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .btn-update, .btn-logout { color: white; border: none; padding: 10px 20px; border-radius: 25px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .btn-update { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4); }
+        .btn-logout { background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); box-shadow: 0 4px 15px rgba(214, 48, 49, 0.4); }
+        .btn-update:hover, .btn-logout:hover { transform: translateY(-2px); }
+
+        /* تنسيقات إضافية للأدمن */
+        .admin-controls { display: none; padding: 0 20px; margin-top: 15px; }
+        .admin-controls label { font-weight: 700; font-size: 14px; margin-bottom: 5px; display: block; color: var(--dark); text-align: right;}
+        .admin-controls select { width: 100%; padding: 10px 15px; border-radius: 15px; border: 2px solid #dfe6e9; font-family: 'Cairo', sans-serif; font-size: 15px; outline: none; background: #fff; color: var(--dark); cursor: pointer; transition: all 0.3s; }
+        .admin-controls select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(245, 185, 33, 0.1); }
+
+        .orders-section { padding: 20px; flex: 1; overflow-y: auto; }
+        .order-card { background: #fff; border-radius: 20px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.04); border: 1px dashed #dfe6e9; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .order-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-color: var(--primary); }
+
+        .order-right { display: flex; align-items: center; gap: 15px; cursor: pointer; padding: 10px; border-radius: 15px; flex: 1; }
+        .order-right:hover { background: #f8f9fa; }
+        .icon-wrapper { display: flex; flex-direction: column; align-items: center; color: var(--danger); }
+        .icon-wrapper i { font-size: 28px; margin-bottom: 5px; }
+        .icon-wrapper span { font-size: 12px; font-weight: 700; color: #636e72; }
+        .order-info h3 { font-size: 18px; margin-bottom: 2px; }
+        .order-info p.city { color: #636e72; font-size: 14px; margin-bottom: 8px; }
+        .order-info p.amount { font-size: 13px; font-weight: 700; color: var(--dark); }
+
+        .order-left { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px 15px; border-radius: 12px; transition: all 0.3s; background: #fdfdfd; border: 1px solid #eee; min-width: 90px; }
+        .order-left:hover { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(245, 185, 33, 0.3); border-color: var(--primary); }
+        .order-left i { font-size: 18px; margin-bottom: 5px; }
+        .order-left .status-text { font-size: 14px; font-weight: 700; text-align: center; }
+
+        /* الشاشة المنبثقة */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: #fff; width: 90%; max-width: 450px; border-radius: 25px; max-height: 85vh; overflow-y: auto; position: relative; transform: scale(0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 25px; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .close-btn { position: absolute; top: 15px; left: 15px; background: #ffeaa7; color: var(--dark); border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .close-btn:hover { background: var(--danger); color: white; transform: rotate(90deg); }
+
+        .detail-title { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--primary); border-bottom: 2px dashed #eee; padding-bottom: 10px; }
+        .location-step { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .indicator { width: 15px; height: 15px; border-radius: 50%; margin-top: 5px; margin-left: 10px; flex-shrink: 0; }
+        .ind-red { color: var(--danger); background: var(--danger); }
+        .ind-green { color: var(--success); background: var(--success); }
+        .loc-details h4 { font-size: 16px; margin-bottom: 3px;}
+        .loc-details p { font-size: 14px; color: #636e72;}
+        .divider { height: 1px; background: #eee; margin: 15px 0; }
+
+        .person-card { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #edf2f7; }
+        .person-card h4 { font-size: 15px; margin-bottom: 10px; color: var(--dark); }
+        .contact-row { display: flex; align-items: center; justify-content: space-between; }
+        .phone-num { font-size: 15px; font-weight: 700; direction: ltr; }
+        .actions { display: flex; gap: 10px; }
+        .action-btn { width: 40px; height: 40px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; font-size: 18px; color: white; cursor: pointer; }
+        .btn-call { background: #0984e3; } .btn-call:hover { background: #74b9ff; transform: translateY(-3px); }
+        .btn-wa { background: #25D366; } .btn-wa:hover { background: #128C7E; transform: translateY(-3px); }
+
+        .financial-box { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 15px; padding: 15px; }
+        .fin-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; font-weight: 600; }
+        .fin-total { margin-top: 10px; padding-top: 10px; border-top: 2px dashed #ffeaa7; font-size: 18px; font-weight: 800; color: #d35400; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 10px; }
+
+        .loading-text { text-align: center; color: #636e72; font-weight: 700; margin-top: 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div class="app-container">
+        <header>
+            <img src="WhatsApp%20Image%202026-05-28%20at%201.31.00%20PM.jpeg" alt="Delivery" class="brand-image">
+            <h1 class="brand-title">HABSHA | هَبْشَة</h1>
+            
+            <p class="greeting">أهلاً يا كابتن <span id="displayCaptainName"></span></p>
+            
+            <div class="header-buttons">
+                <button class="btn-update" onclick="refreshData()">
+                    تحديث <i class="fas fa-sync-alt" id="syncIcon"></i>
+                </button>
+                <button class="btn-logout" onclick="logout()">
+                    خروج <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-controls" id="adminControls">
+            <label>تصفية الطلبات للكباتن:</label>
+            <select id="adminCaptainSelect" onchange="filterAdminOrders()">
+                <option value="all">عرض جميع الطلبات (لكل الكباتن)</option>
+                <option value="عثمان التجاني">عثمان التجاني</option>
+                <option value="نسيبة صلاح الدين">نسيبة صلاح الدين</option>
+                <option value="محمد عادل علي يوسف">محمد عادل علي يوسف</option>
+            </select>
+        </div>
+
+        <div class="orders-section" id="ordersList">
+            <div class="loading-text">جاري جلب الطلبات... <i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <h2 class="detail-title">تفاصيل الطلب</h2>
+            
+            <div class="location-step">
+                <div class="indicator ind-red"></div>
+                <div class="loc-details">
+                    <h4>من</h4>
+                    <p id="m-fromLocation"></p>
+                </div>
+            </div>
+            <div class="location-step">
+                <div class="indicator ind-green"></div>
+                <div class="loc-details">
+                    <h4>إلى</h4>
+                    <p id="m-toLocation"></p>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="person-card">
+                <h4 id="m-senderName"></h4>
+                <div class="contact-row">
+                    <span class="phone-num" id="m-senderPhone"></span>
+                    <div class="actions">
+                        <button class="action-btn btn-call" id="btn-call-sender"><i class="fas fa-phone"></i></button>
+                        <button class="action-btn btn-wa" id="btn-wa-sender"><i class="fab fa-whatsapp"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="person-card">
+                <h4 id="m-receiverName"></h4>
+                <div class="contact-row">
+                    <span class="phone-num" id="m-receiverPhone"></span>
+                    <div class="actions">
+                        <button class="action-btn btn-call" id="btn-call-receiver"><i class="fas fa-phone"></i></button>
+                        <button class="action-btn btn-wa" id="btn-wa-receiver"><i class="fab fa-whatsapp"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="financial-box">
+                <div class="fin-row">
+                    <span>مبلغ التوصيل:</span>
+                    <span id="m-deliveryFee"></span>
+                </div>
+                <div class="fin-row">
+                    <span>المبالغ المستلمة:</span>
+                    <span id="m-receivedAmount"></span>
+                </div>
+                <div class="fin-row fin-total">
+                    <span>المبلغ الكلي:</span>
+                    <span id="m-totalAmount"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        // === حماية الشاشة وتحديد المستخدم ===
+        let currentCaptain = localStorage.getItem('loggedCaptain');
+        let userRole = localStorage.getItem('userRole');
+        
+        // إذا لم يقم بتسجيل الدخول، إرجاعه لشاشة الدخول الجديدة فوراً
+        if (!currentCaptain) {
+            window.location.replace("habsha_login.html");
+        } else {
+            // عرض اسم المستخدم، وإضافة كلمة "مدير" إذا كان أدمن
+            document.getElementById('displayCaptainName').innerText = currentCaptain + (userRole === 'admin' ? " (مدير)" : "");
+            
+            // إظهار لوحة التحكم (القائمة المنسدلة) إذا كان أدمن
+            if (userRole === 'admin') {
+                document.getElementById('adminControls').style.display = 'block';
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNIBx_OuXWhPCcoDakf_6Spf3_bYMaRE0",
+            authDomain: "wasel-2ffdb.firebaseapp.com",
+            databaseURL: "https://wasel-2ffdb-default-rtdb.firebaseio.com",
+            projectId: "wasel-2ffdb",
+            storageBucket: "wasel-2ffdb.firebasestorage.app",
+            messagingSenderId: "1085350406361",
+            appId: "1:1085350406361:web:660ae3010cc9ff430176c8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.allFetchedData = {}; 
+        window.filteredOrdersData = {}; 
+
+        const ordersRef = ref(db, 'orders');
+        const ordersListDiv = document.getElementById('ordersList');
+
+        onValue(ordersRef, (snapshot) => {
+            window.allFetchedData = snapshot.val();
+            renderOrders();
+        });
+
+        // دالة مخصصة للأدمن لتحديث العرض عند تغيير الكابتن من القائمة
+        window.filterAdminOrders = function() {
+            renderOrders();
+        }
+
+        function renderOrders() {
+            ordersListDiv.innerHTML = '';
+            window.filteredOrdersData = {}; 
+            let hasOrders = false;
+
+            // تحديد الكابتن المراد عرض طلباته (لو كان أدمن سيأخذ من القائمة، لو كان كابتن سيتجاهلها)
+            let selectedAdminCaptain = document.getElementById('adminCaptainSelect') ? document.getElementById('adminCaptainSelect').value : 'all';
+
+            if (window.allFetchedData) {
+                for (let orderId in window.allFetchedData) {
+                    let order = window.allFetchedData[orderId];
+                    let shouldDisplay = false;
+
+                    // تطبيق شرط العرض بناءً على الصلاحيات
+                    if (userRole === 'admin') {
+                        // الأدمن يرى جميع الطلبات، أو طلبات الكابتن المحدد في القائمة
+                        if (selectedAdminCaptain === 'all' || order.captainName === selectedAdminCaptain) {
+                            shouldDisplay = true;
+                        }
+                    } else {
+                        // الكابتن يرى طلباته فقط
+                        if (order.captainName === currentCaptain) {
+                            shouldDisplay = true;
+                        }
+                    }
+                    
+                    if (shouldDisplay) {
+                        hasOrders = true;
+                        window.filteredOrdersData[orderId] = order; 
+                        
+                        let statusText = "new";
+                        let btnBgColor = "#fdfdfd";
+                        let btnColor = "#2d3436";
+
+                        if (order.status === 'on_way') {
+                            statusText = "الكابتن في الطريق";
+                            btnBgColor = "#00cec9";
+                            btnColor = "white";
+                        } else if (order.status === 'delivery') {
+                            statusText = "تسليم";
+                            btnBgColor = "#fdcb6e";
+                            btnColor = "white";
+                        }
+
+                        // إضافة اسم الكابتن أعلى الطلب إذا كان المستخدم أدمن (للتوضيح)
+                        let captainBadge = userRole === 'admin' ? `<div style="font-size: 12px; color: var(--primary); font-weight: bold; text-align: center; margin-bottom: 5px;">كابتن: ${order.captainName}</div>` : '';
+
+                        const orderHTML = `
+                            <div class="order-card" id="${orderId}">
+                                <div class="order-right" onclick="openModal('${orderId}')">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>التفاصيل</span>
+                                    </div>
+                                    <div class="order-info">
+                                        ${captainBadge}
+                                        <h3>${order.city || 'غير محدد'}</h3>
+                                        <p class="city">${order.fromLocation || 'غير محدد'} -> ${order.toLocation || 'غير محدد'}</p>
+                                        <p class="amount">المبالغ المستلمة: ${order.receivedAmount || 0}-</p>
+                                    </div>
+                                </div>
+
+                                <div class="order-left" style="background:${btnBgColor}; color:${btnColor};" onclick="changeOrderStatus(event, '${orderId}', '${order.status}')">
+                                    <i class="fas fa-angle-left"></i>
+                                    <span class="status-text">${statusText}</span>
+                                </div>
+                            </div>
+                        `;
+                        ordersListDiv.innerHTML += orderHTML;
+                    }
+                }
+            }
+
+            if (!hasOrders) {
+                let emptyMsg = userRole === 'admin' && selectedAdminCaptain !== 'all' ? `لا توجد طلبات للكابتن (${selectedAdminCaptain}) حالياً` : "لا توجد طلبات حالياً";
+                ordersListDiv.innerHTML = `<div class="loading-text">${emptyMsg}</div>`;
+            }
+        }
+
+        window.openModal = function(orderId) {
+            let order = window.filteredOrdersData[orderId];
+            if(!order) return;
+
+            document.getElementById('m-fromLocation').innerText = order.fromLocation || 'غير محدد';
+            document.getElementById('m-toLocation').innerText = order.toLocation || 'غير محدد';
+            document.getElementById('m-senderName').innerText = "المُسَلِّم: " + (order.senderName || 'غير محدد');
+            document.getElementById('m-senderPhone').innerText = order.senderPhone || 'غير محدد';
+            document.getElementById('m-receiverName').innerText = "المُسْتَلِم: " + (order.receiverName || 'غير محدد');
+            document.getElementById('m-receiverPhone').innerText = order.receiverPhone || 'غير محدد';
+            
+            document.getElementById('m-deliveryFee').innerText = order.deliveryFee || 0;
+            document.getElementById('m-receivedAmount').innerText = order.receivedAmount || 0;
+            
+            let total = parseFloat(order.deliveryFee || 0) + parseFloat(order.receivedAmount || 0);
+            document.getElementById('m-totalAmount').innerText = total + " ج.س";
+
+            document.getElementById('btn-call-sender').onclick = () => makeCall(order.senderPhone);
+            document.getElementById('btn-wa-sender').onclick = () => openWhatsApp(order.senderPhone);
+            document.getElementById('btn-call-receiver').onclick = () => makeCall(order.receiverPhone);
+            document.getElementById('btn-wa-receiver').onclick = () => openWhatsApp(order.receiverPhone);
+
+            const modal = document.getElementById('detailsModal');
+            modal.classList.add('active');
+        }
+
+        window.closeModal = function() {
+            const modal = document.getElementById('detailsModal');
+            modal.classList.remove('active');
+        }
+
+        window.changeOrderStatus = function(event, orderId, currentStatus) {
+            event.stopPropagation();
+            const specificOrderRef = ref(db, 'orders/' + orderId);
+
+            if (currentStatus === 'new' || !currentStatus) {
+                if (confirm("هل انت متأكد للتقدم الى الطلب؟")) {
+                    update(specificOrderRef, { status: 'on_way' });
+                }
+            } 
+            else if (currentStatus === 'on_way') {
+                if (confirm("هل انت متأكد للتقدم الى الطلب؟")) {
+                    update(specificOrderRef, { status: 'delivery' });
+                }
+            } 
+            else if (currentStatus === 'delivery') {
+                if (confirm("هل انت متأكد للتقدم الى الطلب؟ (سيتم إنهاء الطلب وإخفاؤه)")) {
+                    let orderCard = document.getElementById(orderId);
+                    if(orderCard) {
+                        orderCard.style.transform = "translateX(100px)";
+                        orderCard.style.opacity = "0";
+                    }
+                    setTimeout(() => {
+                        remove(specificOrderRef);
+                    }, 400);
+                }
+            }
+        }
+
+        window.refreshData = function() {
+            let icon = document.getElementById('syncIcon');
+            icon.style.transform = "rotate(360deg)";
+            setTimeout(() => {
+                icon.style.transform = "rotate(0deg)";
+            }, 800);
+        }
+
+        // تم تعديل التوجيه إلى الشاشة بالاسم الجديد
+        window.logout = function() {
+            if (confirm("هل تريد تسجيل الخروج حقاً؟")) {
+                localStorage.removeItem('loggedCaptain');
+                localStorage.removeItem('userRole');
+                window.location.replace("habsha_login.html");
+            }
+        }
+
+        window.makeCall = function(number) {
+            if(number && number.length >= 9) {
+                window.location.href = `tel:${number}`;
+            } else {
+                alert("رقم الهاتف غير صالح");
+            }
+        }
+
+        window.openWhatsApp = function(number) {
+            if(number && number.length >= 9) {
+                let waNumber = number.startsWith('0') ? '249' + number.substring(1) : number;
+                window.open(`https://api.whatsapp.com/send?phone=${waNumber}`, '_blank');
+            } else {
+                alert("رقم الواتساب غير صالح");
+            }
+        }
+    </script>
+</body>
+</html>
