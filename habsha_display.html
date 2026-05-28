@@ -30,9 +30,63 @@
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--glass-bg); backdrop-filter: blur(10px); box-shadow: var(--glass-shadow); position: relative; display: flex; flex-direction: column; }
         header { background: #fff; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; padding: 30px 20px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
-        .brand-image { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 15px; transition: transform 0.3s; }
-        .brand-title { font-size: 24px; font-weight: 800; letter-spacing: 1px; margin-bottom: 5px; }
-        .greeting { color: #636e72; font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+        
+        /* ================= الحركات والتنسيقات الجديدة للوجو والاسم ================= */
+        .brand-image { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 25px; 
+            object-fit: cover; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+            display: block;
+            margin: 0 auto 15px auto; 
+            border: 3px solid white; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+        }
+        .brand-image:hover { 
+            transform: rotate(360deg) scale(1.15); 
+            box-shadow: 0 15px 25px rgba(245, 185, 33, 0.4); 
+            border-color: var(--primary); 
+        }
+
+        .brand-title { 
+            font-size: 32px; 
+            font-weight: 900; 
+            letter-spacing: 2px; 
+            margin-bottom: 10px; 
+            position: relative; 
+            display: inline-block; 
+            background: linear-gradient(45deg, var(--dark), var(--primary), var(--secondary), var(--primary)); 
+            background-size: 300% auto; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: shineText 3s infinite linear, bounceTitle 2s ease-in-out infinite alternate; 
+        }
+        .brand-title::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -5px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 20px; 
+            height: 4px; 
+            background: var(--primary); 
+            border-radius: 10px; 
+            animation: expandLine 2s ease-in-out infinite alternate; 
+        }
+
+        @keyframes shineText { to { background-position: 200% center; } }
+        @keyframes bounceTitle { 
+            0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 2px rgba(245, 185, 33, 0.2)); } 
+            100% { transform: translateY(-5px) scale(1.05); filter: drop-shadow(0 5px 15px rgba(245, 185, 33, 0.6)); } 
+        }
+        @keyframes expandLine { 
+            0% { width: 20px; opacity: 0.5; box-shadow: 0 0 0px var(--primary); } 
+            100% { width: 80px; opacity: 1; box-shadow: 0 0 10px var(--primary); } 
+        }
+        /* ================= نهاية التنسيقات الجديدة ================= */
+
+        .greeting { color: #636e72; font-size: 16px; font-weight: 600; margin-bottom: 15px; margin-top: 10px; }
 
         .header-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .btn-update, .btn-logout { color: white; border: none; padding: 10px 20px; border-radius: 25px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
@@ -268,7 +322,7 @@
     <div class="app-container">
         <header>
             <img src="WhatsApp%20Image%202026-05-28%20at%201.31.00%20PM.jpeg" alt="Delivery" class="brand-image">
-            <h1 class="brand-title">HABSHA | هَبْشَة</h1>
+            <h1 class="brand-title">TALQA | طلقة</h1>
             
             <p class="greeting">أهلاً يا كابتن <span id="displayCaptainName"></span></p>
             
@@ -364,184 +418,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-        // ================= دوال القائمة الجانبية =================
         window.openSidebar = function() {
             document.getElementById('sidebar').classList.add('active');
             document.getElementById('sidebarOverlay').classList.add('active');
         }
+
         window.closeSidebar = function() {
             document.getElementById('sidebar').classList.remove('active');
             document.getElementById('sidebarOverlay').classList.remove('active');
         }
 
-        // ================= دوال الملف الشخصي المنبثق =================
-        window.openProfile = function() {
-            let savedName = localStorage.getItem('loggedCaptain') || localStorage.getItem('profileName') || 'محمد عادل علي يوسف';
-            let savedPhone = localStorage.getItem('profilePhone') || '';
-            let savedAddress = localStorage.getItem('profileAddress') || '';
-            let savedImage = localStorage.getItem('profileImage');
-
-            document.getElementById('profileName').value = savedName;
-            document.getElementById('profilePhone').value = savedPhone;
-            document.getElementById('profileAddress').value = savedAddress;
-
-            if (savedImage) {
-                document.getElementById('imagePreview').style.backgroundImage = `url(${savedImage})`;
-            }
-
-            document.getElementById('profileOverlay').classList.add('active');
-            document.getElementById('profilePanel').classList.add('active');
-        }
-        window.closeProfile = function() {
-            document.getElementById('profileOverlay').classList.remove('active');
-            document.getElementById('profilePanel').classList.remove('active');
-        }
-
-        document.getElementById('imageUpload').addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').style.backgroundImage = `url(${e.target.result})`;
-                    localStorage.setItem('tempProfileImage', e.target.result);
-                }
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-
-        window.saveProfile = function(event) {
-            event.preventDefault();
-            let name = document.getElementById('profileName').value;
-            let phone = document.getElementById('profilePhone').value;
-            let address = document.getElementById('profileAddress').value;
-            let tempImage = localStorage.getItem('tempProfileImage');
-
-            const saveBtn = document.getElementById('saveBtn');
-            const originalBtnText = saveBtn.innerHTML;
-            saveBtn.innerHTML = 'جاري الحفظ... <i class="fas fa-spinner fa-spin"></i>';
-            saveBtn.disabled = true;
-
-            setTimeout(() => {
-                localStorage.setItem('profileName', name);
-                localStorage.setItem('loggedCaptain', name); 
-                localStorage.setItem('profilePhone', phone);
-                localStorage.setItem('profileAddress', address);
-                
-                if(tempImage) {
-                    localStorage.setItem('profileImage', tempImage);
-                }
-
-                let roleStr = localStorage.getItem('userRole') === 'admin' ? " (مدير)" : "";
-                document.getElementById('displayCaptainName').innerText = name + roleStr;
-
-                saveBtn.innerHTML = originalBtnText;
-                saveBtn.disabled = false;
-
-                alert("تم تحديث ملفك الشخصي بنجاح!");
-                closeProfile();
-            }, 1000);
-        }
-
-        // ================= دوال الطلبات السابقة المنبثقة =================
-        window.openHistory = function() {
-            document.getElementById('historyOverlay').classList.add('active');
-            document.getElementById('historyPanel').classList.add('active');
-            
-            if (localStorage.getItem('userRole') === 'admin') {
-                document.getElementById('adminHistoryControls').style.display = 'block';
-            }
-            renderHistoryOrders();
-        }
-        window.closeHistory = function() {
-            document.getElementById('historyOverlay').classList.remove('active');
-            document.getElementById('historyPanel').classList.remove('active');
-        }
-
-        window.renderHistoryOrders = function() {
-            const listDiv = document.getElementById('historyOrdersList');
-            listDiv.innerHTML = '';
-            let hasHistory = false;
-            
-            let selectedAdminCaptain = document.getElementById('adminHistoryCaptainSelect') ? document.getElementById('adminHistoryCaptainSelect').value : 'all';
-            let currentCaptainLocal = localStorage.getItem('loggedCaptain');
-            let userRoleLocal = localStorage.getItem('userRole');
-
-            if (window.allFetchedData) {
-                // نعكس عشان نجيب أحدث الطلبات المنتهية أول شيء
-                let orderKeys = Object.keys(window.allFetchedData).reverse();
-                
-                for (let orderId of orderKeys) {
-                    let order = window.allFetchedData[orderId];
-                    let shouldDisplay = false;
-
-                    // نفلتر بس الطلبات اللي حالتها completed
-                    if (order.status === 'completed') {
-                        if (userRoleLocal === 'admin') {
-                            if (selectedAdminCaptain === 'all' || order.captainName === selectedAdminCaptain) {
-                                shouldDisplay = true;
-                            }
-                        } else {
-                            if (order.captainName === currentCaptainLocal) {
-                                 shouldDisplay = true;
-                            }
-                        }
-                    }
-                    
-                    if (shouldDisplay) {
-                        hasHistory = true;
-                        let captainBadge = userRoleLocal === 'admin' ? `<div style="font-size: 11px; color: var(--primary); font-weight: bold; margin-bottom: 2px;">كابتن: ${order.captainName}</div>` : '';
-                        let totalAmount = parseFloat(order.deliveryFee || 0) + parseFloat(order.receivedAmount || 0);
-
-                        const orderHTML = `
-                            <div class="history-card">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; border-bottom: 1px dashed #eee; padding-bottom: 10px;">
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <div style="color: var(--success); font-size: 24px;"><i class="fas fa-check-circle"></i></div>
-                                        <div>
-                                            ${captainBadge}
-                                            <h3 style="font-size: 15px; margin-bottom: 2px; color: var(--dark);">${order.city || 'غير محدد'}</h3>
-                                            <p style="font-size: 12px; color: #636e72; margin-bottom: 0;">${order.fromLocation || ''} <i class="fas fa-arrow-left" style="font-size:10px;"></i> ${order.toLocation || ''}</p>
-                                        </div>
-                                    </div>
-                                    <div class="history-status-badge">
-                                        <i class="fas fa-check-double"></i>
-                                        <span>مكتمل</span>
-                                    </div>
-                                </div>
-                                
-                                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: #636e72; width: 100%;">
-                                    <div class="history-details-row">
-                                        <span><i class="fas fa-user" style="color:var(--primary); margin-left:3px;"></i> المُسَلِّم: <b>${order.senderName || 'غير محدد'}</b></span>
-                                        <span dir="ltr">${order.senderPhone || ''} <i class="fas fa-phone-alt" style="font-size:10px;"></i></span>
-                                    </div>
-                                    <div class="history-details-row">
-                                        <span><i class="fas fa-user-check" style="color:var(--success); margin-left:3px;"></i> المُسْتَلِم: <b>${order.receiverName || 'غير محدد'}</b></span>
-                                        <span dir="ltr">${order.receiverPhone || ''} <i class="fas fa-phone-alt" style="font-size:10px;"></i></span>
-                                    </div>
-                                </div>
-
-                                <div class="history-finance-box" style="width: 100%;">
-                                    <div class="history-finance-info">
-                                        <div>مبلغ التوصيل: ${order.deliveryFee || 0}</div>
-                                        <div>المبلغ المستلم: ${order.receivedAmount || 0}</div>
-                                    </div>
-                                    <div class="history-total">
-                                        الإجمالي: ${totalAmount} ج.س
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        listDiv.innerHTML += orderHTML;
-                    }
-                }
-            }
-
-            if (!hasHistory) {
-                listDiv.innerHTML = `<div class="loading-text" style="font-size:14px;">لا توجد طلبات مكتملة في السجل</div>`;
-            }
-        }
-
-
-        // ================= الإعدادات الرئيسية والفايربيس =================
         let currentCaptain = localStorage.getItem('loggedCaptain');
         let userRole = localStorage.getItem('userRole');
         
@@ -576,7 +462,6 @@
         onValue(ordersRef, (snapshot) => {
             window.allFetchedData = snapshot.val();
             renderOrders();
-            // تحديث السجل برضك لو الشاشة حقته فاتحة
             if(document.getElementById('historyPanel').classList.contains('active')){
                 renderHistoryOrders();
             }
@@ -598,7 +483,6 @@
                     let order = window.allFetchedData[orderId];
                     let shouldDisplay = false;
 
-                    // إخفاء الطلبات المكتملة من الشاشة الرئيسية
                     if (order.status === 'completed') {
                         continue;
                     }
@@ -711,7 +595,6 @@
                 }
             } 
             else if (currentStatus === 'delivery') {
-                // هنا التغيير الأساسي: بدل المسح بنغير الحالة لمكتمل
                 if (confirm("هل انت متأكد للتقدم الى الطلب؟ (سيتم إنهاء الطلب ونقله للسجل)")) {
                     let orderCard = document.getElementById(orderId);
                     if(orderCard) {
@@ -731,6 +614,15 @@
             setTimeout(() => {
                 icon.style.transform = "rotate(0deg)";
             }, 800);
+            
+            // هنا التعديل: تصفير الشاشة وإظهار رسالة جاري التحديث
+            const ordersListDiv = document.getElementById('ordersList');
+            ordersListDiv.innerHTML = '<div class="loading-text">جاري تحديث الطلبات... <i class="fas fa-spinner fa-spin"></i></div>';
+            
+            // إعادة رسم الطلبات باستخدام الداتا الحالية بعد ثانية ليعطي إحساس التحديث
+            setTimeout(() => {
+                renderOrders();
+            }, 1000);
         }
 
         window.logout = function() {
@@ -757,6 +649,170 @@
                 alert("رقم الواتساب غير صالح");
             }
         }
+
+        window.openProfile = function() {
+            let savedName = localStorage.getItem('loggedCaptain') || localStorage.getItem('profileName') || 'محمد عادل علي يوسف';
+            let savedPhone = localStorage.getItem('profilePhone') || '';
+            let savedAddress = localStorage.getItem('profileAddress') || '';
+            let savedImage = localStorage.getItem('profileImage');
+
+            document.getElementById('profileName').value = savedName;
+            document.getElementById('profilePhone').value = savedPhone;
+            document.getElementById('profileAddress').value = savedAddress;
+
+            if (savedImage) {
+                document.getElementById('imagePreview').style.backgroundImage = `url(${savedImage})`;
+            }
+
+            document.getElementById('profileOverlay').classList.add('active');
+            document.getElementById('profilePanel').classList.add('active');
+        }
+
+        window.closeProfile = function() {
+            document.getElementById('profileOverlay').classList.remove('active');
+            document.getElementById('profilePanel').classList.remove('active');
+        }
+
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').style.backgroundImage = `url(${e.target.result})`;
+                    localStorage.setItem('tempProfileImage', e.target.result);
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        window.saveProfile = function(event) {
+            event.preventDefault();
+            let name = document.getElementById('profileName').value;
+            let phone = document.getElementById('profilePhone').value;
+            let address = document.getElementById('profileAddress').value;
+            let tempImage = localStorage.getItem('tempProfileImage');
+
+            const saveBtn = document.getElementById('saveBtn');
+            const originalBtnText = saveBtn.innerHTML;
+            saveBtn.innerHTML = 'جاري الحفظ... <i class="fas fa-spinner fa-spin"></i>';
+            saveBtn.disabled = true;
+
+            setTimeout(() => {
+                localStorage.setItem('profileName', name);
+                localStorage.setItem('loggedCaptain', name); 
+                localStorage.setItem('profilePhone', phone);
+                localStorage.setItem('profileAddress', address);
+                
+                if(tempImage) {
+                    localStorage.setItem('profileImage', tempImage);
+                }
+
+                let roleStr = localStorage.getItem('userRole') === 'admin' ? " (مدير)" : "";
+                document.getElementById('displayCaptainName').innerText = name + roleStr;
+
+                saveBtn.innerHTML = originalBtnText;
+                saveBtn.disabled = false;
+
+                alert("تم تحديث ملفك الشخصي بنجاح!");
+                closeProfile();
+            }, 1000);
+        }
+
+        window.openHistory = function() {
+            document.getElementById('historyOverlay').classList.add('active');
+            document.getElementById('historyPanel').classList.add('active');
+            
+            if (localStorage.getItem('userRole') === 'admin') {
+                document.getElementById('adminHistoryControls').style.display = 'block';
+            }
+            renderHistoryOrders();
+        }
+
+        window.closeHistory = function() {
+            document.getElementById('historyOverlay').classList.remove('active');
+            document.getElementById('historyPanel').classList.remove('active');
+        }
+
+        window.renderHistoryOrders = function() {
+            const listDiv = document.getElementById('historyOrdersList');
+            listDiv.innerHTML = '';
+            let hasHistory = false;
+            
+            let selectedAdminCaptain = document.getElementById('adminHistoryCaptainSelect') ? document.getElementById('adminHistoryCaptainSelect').value : 'all';
+            let currentCaptainLocal = localStorage.getItem('loggedCaptain');
+            let userRoleLocal = localStorage.getItem('userRole');
+
+            if (window.allFetchedData) {
+                let orderKeys = Object.keys(window.allFetchedData).reverse();
+                
+                for (let orderId of orderKeys) {
+                    let order = window.allFetchedData[orderId];
+                    let shouldDisplay = false;
+
+                    if (order.status === 'completed') {
+                        if (userRoleLocal === 'admin') {
+                            if (selectedAdminCaptain === 'all' || order.captainName === selectedAdminCaptain) {
+                                shouldDisplay = true;
+                            }
+                        } else {
+                            if (order.captainName === currentCaptainLocal) {
+                                 shouldDisplay = true;
+                            }
+                        }
+                    }
+                    
+                    if (shouldDisplay) {
+                        hasHistory = true;
+                        let captainBadge = userRoleLocal === 'admin' ? `<div style="font-size: 11px; color: var(--primary); font-weight: bold; margin-bottom: 2px;">كابتن: ${order.captainName}</div>` : '';
+                        let totalAmount = parseFloat(order.deliveryFee || 0) + parseFloat(order.receivedAmount || 0);
+
+                        const orderHTML = `
+                            <div class="history-card">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; border-bottom: 1px dashed #eee; padding-bottom: 10px;">
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <div style="color: var(--success); font-size: 24px;"><i class="fas fa-check-circle"></i></div>
+                                        <div>
+                                            ${captainBadge}
+                                            <h3 style="font-size: 15px; margin-bottom: 2px; color: var(--dark);">${order.city || 'غير محدد'}</h3>
+                                            <p style="font-size: 12px; color: #636e72; margin-bottom: 0;">${order.fromLocation || ''} <i class="fas fa-arrow-left" style="font-size:10px;"></i> ${order.toLocation || ''}</p>
+                                        </div>
+                                    </div>
+                                    <div class="history-status-badge">
+                                        <i class="fas fa-check-double"></i>
+                                        <span>مكتمل</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: #636e72; width: 100%;">
+                                    <div class="history-details-row">
+                                        <span><i class="fas fa-user" style="color:var(--primary); margin-left:3px;"></i> المُسَلِّم: <b>${order.senderName || 'غير محدد'}</b></span>
+                                        <span dir="ltr">${order.senderPhone || ''} <i class="fas fa-phone-alt" style="font-size:10px;"></i></span>
+                                    </div>
+                                    <div class="history-details-row">
+                                        <span><i class="fas fa-user-check" style="color:var(--success); margin-left:3px;"></i> المُسْتَلِم: <b>${order.receiverName || 'غير محدد'}</b></span>
+                                        <span dir="ltr">${order.receiverPhone || ''} <i class="fas fa-phone-alt" style="font-size:10px;"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="history-finance-box" style="width: 100%;">
+                                    <div class="history-finance-info">
+                                        <div>مبلغ التوصيل: ${order.deliveryFee || 0}</div>
+                                        <div>المبلغ المستلم: ${order.receivedAmount || 0}</div>
+                                    </div>
+                                    <div class="history-total">
+                                        الإجمالي: ${totalAmount} ج.س
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        listDiv.innerHTML += orderHTML;
+                    }
+                }
+            }
+
+            if (!hasHistory) {
+                listDiv.innerHTML = `<div class="loading-text" style="font-size:14px;">لا توجد طلبات مكتملة في السجل</div>`;
+            }
+        }
     </script>
 </body>
-</html> الكود ده ظبط معاي جدا ومافيهو اي خلل شكرا ليك انا عاوز زر تحديث زيو في شاشة الطلبيات السابقة عشان اقدر اعمل تحديث لانو بعض الاحيان النت عندي بيفصل
+</html>
