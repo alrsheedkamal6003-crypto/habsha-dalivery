@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هبشة | الطلبات السابقة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #f5b921;
+            --secondary: #00c6ff;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+            --success: #00b894;
+            --danger: #d63031;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f0f2f5; color: var(--dark); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        .bg-shape { position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; animation: float 10s infinite ease-in-out alternate; }
+        .shape1 { width: 300px; height: 300px; background: rgba(245, 185, 33, 0.3); top: -50px; right: -50px; }
+        .shape2 { width: 250px; height: 250px; background: rgba(0, 198, 255, 0.2); bottom: 10%; left: -50px; animation-delay: -5s; }
+
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(30px) scale(1.1); } }
+
+        .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; background: var(--glass-bg); backdrop-filter: blur(10px); box-shadow: var(--glass-shadow); position: relative; display: flex; flex-direction: column; }
+        
+        header { background: #fff; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; padding: 25px 20px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+        
+        .btn-back { position: absolute; top: 25px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: #f0f2f5; border: none; color: var(--dark); display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; transition: all 0.3s; }
+        .btn-back:hover { background: var(--primary); color: white; transform: translateX(5px); }
+
+        .header-title { font-size: 22px; font-weight: 800; color: var(--dark); margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .header-title i { color: var(--success); }
+
+        .admin-controls { display: none; padding: 0 20px; margin-top: 15px; }
+        .admin-controls label { font-weight: 700; font-size: 14px; margin-bottom: 5px; display: block; color: var(--dark); text-align: right;}
+        .admin-controls select { width: 100%; padding: 10px 15px; border-radius: 15px; border: 2px solid #dfe6e9; font-family: 'Cairo', sans-serif; font-size: 15px; outline: none; background: #fff; color: var(--dark); cursor: pointer; transition: all 0.3s; }
+        .admin-controls select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(245, 185, 33, 0.1); }
+
+        .orders-section { padding: 20px; flex: 1; overflow-y: auto; }
+        .order-card { background: #fff; border-radius: 20px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.04); border: 1px dashed #dfe6e9; transition: all 0.4s; }
+        .order-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-color: var(--success); transform: translateY(-3px); }
+
+        .order-right { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .icon-wrapper { display: flex; flex-direction: column; align-items: center; color: var(--success); }
+        .icon-wrapper i { font-size: 28px; margin-bottom: 5px; }
+        .icon-wrapper span { font-size: 12px; font-weight: 700; color: #636e72; }
+        .order-info h3 { font-size: 18px; margin-bottom: 2px; }
+        .order-info p.city { color: #636e72; font-size: 14px; margin-bottom: 8px; }
+        .order-info p.amount { font-size: 13px; font-weight: 700; color: var(--dark); }
+
+        /* الشارة الخضراء للطلبات المكتملة */
+        .status-badge { background: #e8f8f5; color: var(--success); padding: 8px 15px; border-radius: 12px; font-weight: 700; font-size: 13px; display: flex; flex-direction: column; align-items: center; border: 1px solid #c8e6c9; }
+        .status-badge i { font-size: 16px; margin-bottom: 5px; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 10px; }
+
+        .loading-text { text-align: center; color: #636e72; font-weight: 700; margin-top: 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div class="app-container">
+        <header>
+            <button class="btn-back" onclick="window.location.href='habsha_display.html'">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1 class="header-title"><i class="fas fa-history"></i> السجل والطلبات المكتملة</h1>
+            <p style="color: #636e72; font-size: 14px; font-weight: 600; margin-top: 5px;">كابتن <span id="displayCaptainName"></span></p>
+        </header>
+
+        <div class="admin-controls" id="adminControls">
+            <label>تصفية السجل للكباتن:</label>
+            <select id="adminCaptainSelect" onchange="filterAdminOrders()">
+                <option value="all">عرض سجل جميع الطلبات</option>
+                <option value="عثمان التجاني">عثمان التجاني</option>
+                <option value="نسيبة صلاح الدين">نسيبة صلاح الدين</option>
+                <option value="محمد عادل علي يوسف">محمد عادل علي يوسف</option>
+            </select>
+        </div>
+
+        <div class="orders-section" id="ordersList">
+            <div class="loading-text">جاري جلب السجل... <i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        // === حماية الشاشة وتحديد المستخدم ===
+        let currentCaptain = localStorage.getItem('loggedCaptain');
+        let userRole = localStorage.getItem('userRole');
+        
+        if (!currentCaptain) {
+            window.location.replace("habsha_login.html");
+        } else {
+            document.getElementById('displayCaptainName').innerText = currentCaptain + (userRole === 'admin' ? " (مدير)" : "");
+            if (userRole === 'admin') {
+                document.getElementById('adminControls').style.display = 'block';
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNIBx_OuXWhPCcoDakf_6Spf3_bYMaRE0",
+            authDomain: "wasel-2ffdb.firebaseapp.com",
+            databaseURL: "https://wasel-2ffdb-default-rtdb.firebaseio.com",
+            projectId: "wasel-2ffdb",
+            storageBucket: "wasel-2ffdb.firebasestorage.app",
+            messagingSenderId: "1085350406361",
+            appId: "1:1085350406361:web:660ae3010cc9ff430176c8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.allFetchedData = {}; 
+
+        const ordersRef = ref(db, 'orders');
+        const ordersListDiv = document.getElementById('ordersList');
+
+        onValue(ordersRef, (snapshot) => {
+            window.allFetchedData = snapshot.val();
+            renderOrders();
+        });
+
+        window.filterAdminOrders = function() {
+            renderOrders();
+        }
+
+        function renderOrders() {
+            ordersListDiv.innerHTML = '';
+            let hasOrders = false;
+
+            let selectedAdminCaptain = document.getElementById('adminCaptainSelect') ? document.getElementById('adminCaptainSelect').value : 'all';
+
+            if (window.allFetchedData) {
+                // عكس الترتيب لعرض أحدث الطلبات المنتهية أولاً
+                let orderKeys = Object.keys(window.allFetchedData).reverse();
+                
+                for (let orderId of orderKeys) {
+                    let order = window.allFetchedData[orderId];
+                    let shouldDisplay = false;
+
+                    // هنا السر: نعرض فقط الطلبات اللي حالتها completed
+                    if (order.status === 'completed') {
+                        if (userRole === 'admin') {
+                            if (selectedAdminCaptain === 'all' || order.captainName === selectedAdminCaptain) {
+                                shouldDisplay = true;
+                            }
+                        } else {
+                            if (order.captainName === currentCaptain) {
+                                shouldDisplay = true;
+                            }
+                        }
+                    }
+                    
+                    if (shouldDisplay) {
+                        hasOrders = true;
+                        
+                        let captainBadge = userRole === 'admin' ? `<div style="font-size: 12px; color: var(--primary); font-weight: bold; text-align: center; margin-bottom: 5px;">كابتن: ${order.captainName}</div>` : '';
+
+                        const orderHTML = `
+                            <div class="order-card" id="${orderId}">
+                                <div class="order-right">
+                                    <div class="icon-wrapper">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="order-info">
+                                        ${captainBadge}
+                                        <h3>${order.city || 'غير محدد'}</h3>
+                                        <p class="city">${order.fromLocation || 'غير محدد'} -> ${order.toLocation || 'غير محدد'}</p>
+                                        <p class="amount">المبلغ الكلي المستلم: ${parseFloat(order.deliveryFee || 0) + parseFloat(order.receivedAmount || 0)} ج.س</p>
+                                    </div>
+                                </div>
+
+                                <div class="status-badge">
+                                    <i class="fas fa-check-double"></i>
+                                    <span>مكتمل</span>
+                                </div>
+                            </div>
+                        `;
+                        ordersListDiv.innerHTML += orderHTML;
+                    }
+                }
+            }
+
+            if (!hasOrders) {
+                ordersListDiv.innerHTML = `<div class="loading-text">لا توجد طلبات سابقة مكتملة حالياً في السجل</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
